@@ -1,0 +1,12 @@
+services:
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      SERVICES: dynamodb
+      DEBUG: 1
+    volumes: 
+      - ./dynamodb/init.sh:/etc/localstack/init/ready.d/init.sh
+      - ./dynamodb/recipes.json:/tmp/recipes.json
