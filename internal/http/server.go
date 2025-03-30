@@ -11,6 +11,7 @@ import (
 
 	"github.com/dbiagi/shopping-bag/internal/config"
 	"github.com/dbiagi/shopping-bag/internal/http/handler"
+	"github.com/dbiagi/shopping-bag/internal/repository"
 	"github.com/dbiagi/shopping-bag/internal/util"
 	"github.com/gorilla/mux"
 )
@@ -21,11 +22,18 @@ var (
 	}
 )
 
-type Server struct {
-	config.Configuration
-	*http.Server
-	*mux.Router
-}
+type (
+	Server struct {
+		config.Configuration
+		*http.Server
+		*mux.Router
+	}
+
+	handlers struct {
+		handler.CartHandler
+		handler.HealthCheckHandler
+	}
+)
 
 func NewServer(c config.Configuration) *Server {
 	return &Server{
@@ -36,7 +44,9 @@ func NewServer(c config.Configuration) *Server {
 func (s *Server) Start() {
 	server, router := createServer(s.Configuration.WebConfig)
 
-	registerRoutesAndMiddlewares(router)
+	handlers := createHandlers(s.Configuration)
+
+	registerRoutesAndMiddlewares(router, handlers)
 	configureGracefullShutdown(server, s.Configuration.WebConfig)
 }
 
@@ -64,12 +74,10 @@ func createServer(webConfig config.WebConfig) (*http.Server, *mux.Router) {
 	return srv, router
 }
 
-func registerRoutesAndMiddlewares(router *mux.Router) {
-	healthCheckHandler := handler.NewHealthCheckHandler()
-
+func registerRoutesAndMiddlewares(router *mux.Router, h handlers) {
 	router.Use(util.TraceIdMiddleware)
 	router.Use(mux.CORSMethodMiddleware(router))
-	router.HandleFunc("/health", healthCheckHandler.Health).Methods("GET")
+	router.HandleFunc("/health", h.HealthCheckHandler.Health).Methods("GET")
 }
 
 func configureGracefullShutdown(server *http.Server, webConfig config.WebConfig) {
@@ -85,4 +93,20 @@ func configureGracefullShutdown(server *http.Server, webConfig config.WebConfig)
 	server.Shutdown(ctx)
 	slog.Info("Shutting down server")
 	os.Exit(0)
+}
+
+func createHandlers(c config.Configuration) handlers {
+	dynamodb, err := config.CreateDynamoDBConnection(c.AWSConfig)
+
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error creating the dynamodb connection. Error %s.", *err))
+		panic(err)
+	}
+
+	cartRepository := repository.NewCartRepository(dynamodb)
+
+	return handlers{
+		HealthCheckHandler: handler.NewHealthCheckHandler(),
+		CartHandler:        handler.NewCartHandler(cartRepository),
+	}
 }

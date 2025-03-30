@@ -6,6 +6,7 @@ TEST_FILES = ./internal/...
 TEST_FILES_INTEGRATION = ./tests/...
 COMPOSE_FILE = ./docker/docker-compose.yml
 DOCKER_COMPOSE = docker compose -f "${COMPOSE_FILE}"
+GOINSTALL = ${GOEXEC} install
 
 tests:
 	make test-unit
@@ -45,3 +46,6 @@ deps:
 build:
 	@echo "Building..."
 	${GOEXEC} build -o bin/app cmd/main.go
+
+tools:
+	${GOINSTALL} go.uber.org/mock/mockgen@latest
