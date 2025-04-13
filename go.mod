@@ -4,11 +4,14 @@ go 1.24.0
 
 require (
 	github.com/aws/aws-sdk-go v1.55.6
+	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.1
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.9.1
 	go.uber.org/mock v0.5.0
 )
+
+require github.com/felixge/httpsnoop v1.0.3 // indirect
 
 require (
 	github.com/google/uuid v1.6.0

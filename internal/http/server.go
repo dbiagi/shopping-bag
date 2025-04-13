@@ -9,10 +9,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	carthandler "github.com/dbiagi/shopping-bag/internal/cart/handler"
+	cartrepository "github.com/dbiagi/shopping-bag/internal/cart/repository"
 	"github.com/dbiagi/shopping-bag/internal/config"
-	"github.com/dbiagi/shopping-bag/internal/http/handler"
-	"github.com/dbiagi/shopping-bag/internal/repository"
-	"github.com/dbiagi/shopping-bag/internal/util"
+	healthhandler "github.com/dbiagi/shopping-bag/internal/health/handler"
+
+	"github.com/dbiagi/shopping-bag/pkg/middleware"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -29,9 +32,9 @@ type (
 		*mux.Router
 	}
 
-	handlers struct {
-		handler.CartHandler
-		handler.HealthCheckHandler
+	appHandlers struct {
+		carthandler.CartHandler
+		healthhandler.HealthCheckHandler
 	}
 )
 
@@ -74,10 +77,11 @@ func createServer(webConfig config.WebConfig) (*http.Server, *mux.Router) {
 	return srv, router
 }
 
-func registerRoutesAndMiddlewares(router *mux.Router, h handlers) {
-	router.Use(util.TraceIdMiddleware)
+func registerRoutesAndMiddlewares(router *mux.Router, h appHandlers) {
+	router.Use(middleware.TraceIdMiddleware)
 	router.Use(mux.CORSMethodMiddleware(router))
 	router.HandleFunc("/health", h.HealthCheckHandler.Health).Methods("GET")
+	router.Use(handlers.CompressHandler)
 }
 
 func configureGracefullShutdown(server *http.Server, webConfig config.WebConfig) {
@@ -95,7 +99,7 @@ func configureGracefullShutdown(server *http.Server, webConfig config.WebConfig)
 	os.Exit(0)
 }
 
-func createHandlers(c config.Configuration) handlers {
+func createHandlers(c config.Configuration) appHandlers {
 	dynamodb, err := config.CreateDynamoDBConnection(c.AWSConfig)
 
 	if err != nil {
@@ -103,10 +107,10 @@ func createHandlers(c config.Configuration) handlers {
 		panic(err)
 	}
 
-	cartRepository := repository.NewCartRepository(dynamodb)
+	cartRepository := cartrepository.NewCartRepository(dynamodb)
 
-	return handlers{
-		HealthCheckHandler: handler.NewHealthCheckHandler(),
-		CartHandler:        handler.NewCartHandler(cartRepository),
+	return appHandlers{
+		HealthCheckHandler: healthhandler.NewHealthCheckHandler(),
+		CartHandler:        carthandler.NewCartHandler(cartRepository),
 	}
 }

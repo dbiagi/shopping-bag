@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/dbiagi/shopping-bag/internal/util"
+	"github.com/dbiagi/shopping-bag/pkg/httputil"
 )
 
 type (
@@ -31,5 +31,7 @@ func (h *HealthCheckHandler) Health(w http.ResponseWriter, r *http.Request) {
 		Status: Ok,
 	}
 
-	util.JsonResponse(w, r, hc)
+	httputil.NewJsonResponse(
+		httputil.WithBody(hc),
+	).Response(w, r)
 }
