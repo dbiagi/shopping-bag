@@ -12,7 +12,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	repository "github.com/dbiagi/shopping-bag/internal/repository"
+	repository "github.com/dbiagi/shopping-bag/internal/cart/repository"
 	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )

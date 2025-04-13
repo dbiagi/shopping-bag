@@ -4,7 +4,7 @@ COVERAGE_REPORT = coverage.out
 TEST_REPORT = report.out
 TEST_FILES = ./internal/...
 TEST_FILES_INTEGRATION = ./tests/...
-COMPOSE_FILE = ./docker/docker-compose.yml
+COMPOSE_FILE = ./docker/docker-compose.yaml
 DOCKER_COMPOSE = docker compose -f "${COMPOSE_FILE}"
 GOINSTALL = ${GOEXEC} install
 
@@ -14,11 +14,13 @@ tests:
 
 test-unit:
 	@echo "Running tests..."
-	${GOEXEC} test -v ${TEST_FILES}
+	${GOEXEC} test -v -coverprofile="${COVERAGE_REPORT}" ${TEST_FILES}
 
 test-coverage:
-	@echo "Running tests with coverage..."
-	${GOEXEC} test -bench=. -json -coverprofile="${COVERAGE_REPORT}" ${TEST_FILES} > "${TEST_REPORT}"
+	@echo "Resolving dependencies..."
+	make deps
+	@make test-unit
+	# make test-integration >> ${TEST_REPORT}
 
 test-integration:
 	@echo "Running integration tests..."
