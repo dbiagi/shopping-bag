@@ -1,8 +1,9 @@
 package domain
 
 import (
-	productdomain "github.com/dbiagi/shopping-bag/internal/product/domain"
 	"github.com/google/uuid"
+
+	productdomain "github.com/dbiagi/shopping-bag/internal/product/domain"
 )
 
 type (

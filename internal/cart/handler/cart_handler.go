@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
+
 	"github.com/dbiagi/shopping-bag/internal/cart/domain"
 	"github.com/dbiagi/shopping-bag/internal/cart/repository"
 	"github.com/dbiagi/shopping-bag/pkg/httputil"
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 )
 
 type CartHandler struct {

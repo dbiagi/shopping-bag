@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/dbiagi/shopping-bag/cmd/command"
 	"github.com/spf13/cobra"
+
+	"github.com/dbiagi/shopping-bag/cmd/command"
 )
 
 func main() {

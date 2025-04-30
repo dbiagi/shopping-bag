@@ -3,6 +3,7 @@ package command
 import (
 	"github.com/dbiagi/shopping-bag/internal/config"
 	internalhttp "github.com/dbiagi/shopping-bag/internal/http"
+
 	"github.com/spf13/cobra"
 )
 

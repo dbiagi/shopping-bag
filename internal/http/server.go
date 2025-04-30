@@ -14,9 +14,10 @@ import (
 	"github.com/dbiagi/shopping-bag/internal/config"
 	healthhandler "github.com/dbiagi/shopping-bag/internal/health/handler"
 
-	"github.com/dbiagi/shopping-bag/pkg/middleware"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+
+	"github.com/dbiagi/shopping-bag/pkg/middleware"
 )
 
 var (

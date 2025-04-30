@@ -6,12 +6,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dbiagi/shopping-bag/internal/cart/repository"
-	"github.com/dbiagi/shopping-bag/internal/cart/repository/mocks"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+
+	"github.com/dbiagi/shopping-bag/internal/cart/repository"
+	"github.com/dbiagi/shopping-bag/internal/cart/repository/mocks"
 )
 
 func TestGetCart(t *testing.T) {
