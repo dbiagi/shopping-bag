@@ -42,11 +42,12 @@ func (m *MockCartRepositoryInterface) EXPECT() *MockCartRepositoryInterfaceMockR
 }
 
 // CartById mocks base method.
-func (m *MockCartRepositoryInterface) CartById(id uuid.UUID) repository.Cart {
+func (m *MockCartRepositoryInterface) CartById(id uuid.UUID) (*repository.Cart, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CartById", id)
-	ret0, _ := ret[0].(repository.Cart)
-	return ret0
+	ret0, _ := ret[0].(*repository.Cart)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CartById indicates an expected call of CartById.

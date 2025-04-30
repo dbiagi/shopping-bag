@@ -12,10 +12,10 @@ import (
 )
 
 type CartHandler struct {
-	repository.CartRepository
+	CartRepository repository.CartRepositoryInterface
 }
 
-func NewCartHandler(cr repository.CartRepository) CartHandler {
+func NewCartHandler(cr repository.CartRepositoryInterface) CartHandler {
 	return CartHandler{
 		CartRepository: cr,
 	}

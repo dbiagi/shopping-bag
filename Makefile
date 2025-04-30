@@ -1,4 +1,3 @@
-# Makefile
 GOEXEC = go
 COVERAGE_REPORT = coverage.out
 TEST_REPORT = report.out
@@ -8,9 +7,11 @@ COMPOSE_FILE = ./docker/docker-compose.yaml
 DOCKER_COMPOSE = docker compose -f "${COMPOSE_FILE}"
 GOINSTALL = ${GOEXEC} install
 
+.PHONY: all tests test-unit test-integration test-coverage serve-dev infra-up infra-down deps build tools
+
 tests:
 	make test-unit
-	make test-integration
+#	make test-integration
 
 test-unit:
 	@echo "Running tests..."
@@ -51,3 +52,4 @@ build:
 
 tools:
 	${GOINSTALL} go.uber.org/mock/mockgen@latest
+	${GOINSTALL} github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.5

@@ -81,6 +81,8 @@ func registerRoutesAndMiddlewares(router *mux.Router, h appHandlers) {
 	router.Use(middleware.TraceIdMiddleware)
 	router.Use(mux.CORSMethodMiddleware(router))
 	router.HandleFunc("/health", h.HealthCheckHandler.Health).Methods("GET")
+	router.HandleFunc("/carts", h.CartHandler.CreateCart).Methods("POST")
+	router.HandleFunc("/carts/{cartId}", h.CartHandler.Cart).Methods("GET")
 	router.Use(handlers.CompressHandler)
 }
 

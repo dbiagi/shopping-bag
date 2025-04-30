@@ -19,11 +19,11 @@ const (
 
 type (
 	Cart struct {
-		Id string `json:"id"`
+		ID string `json:"id"`
 	}
 
 	CartRepositoryInterface interface {
-		CartById(id uuid.UUID) Cart
+		CartById(id uuid.UUID) (*Cart, error)
 	}
 
 	CartRepository struct {
@@ -37,7 +37,7 @@ func NewCartRepository(db *dynamodb.DynamoDB) CartRepository {
 	}
 }
 
-func (cr *CartRepository) CartById(id uuid.UUID) (*Cart, error) {
+func (cr CartRepository) CartById(id uuid.UUID) (*Cart, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(TableName),
 		Key: map[string]*dynamodb.AttributeValue{
