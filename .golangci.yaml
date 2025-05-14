@@ -31,3 +31,10 @@ formatters:
       - third_party$
       - builtin$
       - examples$
+
+output:
+  formats:
+    text:
+      path: stderr
+    checkstyle:
+      path: ./golangci_report.out

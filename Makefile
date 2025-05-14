@@ -50,6 +50,10 @@ build:
 	@echo "Building..."
 	${GOEXEC} build -o bin/app cmd/main.go
 
+lint:
+	@echo "Running linter..."
+	golangci-lint run ./...
+
 tools:
 	${GOINSTALL} go.uber.org/mock/mockgen@latest
 	${GOINSTALL} github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.5

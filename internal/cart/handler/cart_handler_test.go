@@ -17,6 +17,7 @@ import (
 
 func TestGetCart(t *testing.T) {
 	type testCase struct {
+		name       string
 		assertions func(w *httptest.ResponseRecorder)
 		setup      func(h CartHandler) *mux.Router
 		setupMocks func(cr *mocks.MockCartRepositoryInterface, cartId uuid.UUID)
@@ -24,6 +25,7 @@ func TestGetCart(t *testing.T) {
 
 	tc := []testCase{
 		{
+			name: "given a request to get a cart should return status code 200 with a body",
 			assertions: func(w *httptest.ResponseRecorder) {
 				assert.Equal(t, http.StatusOK, w.Code)
 			},
@@ -44,21 +46,23 @@ func TestGetCart(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		ctrl := gomock.NewController(t)
-		cartRepository := mocks.NewMockCartRepositoryInterface(ctrl)
-		handler := NewCartHandler(cartRepository)
-		cartID := uuid.Must(uuid.NewRandom())
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			cartRepository := mocks.NewMockCartRepositoryInterface(ctrl)
+			handler := NewCartHandler(cartRepository)
+			cartID := uuid.Must(uuid.NewRandom())
 
-		tc.setupMocks(cartRepository, cartID)
+			tc.setupMocks(cartRepository, cartID)
 
-		w := httptest.NewRecorder()
-		r := httptest.NewRequest("GET", fmt.Sprintf("/carts/%s", cartID.String()), nil)
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest("GET", fmt.Sprintf("/carts/%s", cartID.String()), nil)
 
-		router := tc.setup(handler)
-		router.ServeHTTP(w, r)
+			router := tc.setup(handler)
+			router.ServeHTTP(w, r)
 
-		handler.Cart(w, r)
+			handler.Cart(w, r)
 
-		tc.assertions(w)
+			tc.assertions(w)
+		})
 	}
 }
