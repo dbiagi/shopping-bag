@@ -41,17 +41,17 @@ func (m *MockCartRepositoryInterface) EXPECT() *MockCartRepositoryInterfaceMockR
 	return m.recorder
 }
 
-// CartById mocks base method.
-func (m *MockCartRepositoryInterface) CartById(id uuid.UUID) (*repository.Cart, error) {
+// CartByID mocks base method.
+func (m *MockCartRepositoryInterface) CartByID(id uuid.UUID) (*repository.Cart, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CartById", id)
+	ret := m.ctrl.Call(m, "CartByID", id)
 	ret0, _ := ret[0].(*repository.Cart)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CartById indicates an expected call of CartById.
-func (mr *MockCartRepositoryInterfaceMockRecorder) CartById(id any) *gomock.Call {
+// CartByID indicates an expected call of CartByID.
+func (mr *MockCartRepositoryInterfaceMockRecorder) CartByID(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CartById", reflect.TypeOf((*MockCartRepositoryInterface)(nil).CartById), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CartByID", reflect.TypeOf((*MockCartRepositoryInterface)(nil).CartByID), id)
 }

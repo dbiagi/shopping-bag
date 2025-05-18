@@ -40,7 +40,7 @@ func TestGetCart(t *testing.T) {
 					ID: cartID.String(),
 				}
 
-				cr.EXPECT().CartById(cartID).Return(cart, nil)
+				cr.EXPECT().CartByID(cartID).Return(cart, nil)
 			},
 		},
 	}

@@ -24,29 +24,29 @@ func NewCartHandler(cr repository.CartRepositoryInterface) CartHandler {
 
 func (c *CartHandler) Cart(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	cartId, err := uuid.Parse(vars["cartId"])
+	cartID, err := uuid.Parse(vars["cartId"])
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		httputil.NewJsonResponse().Response(w, r)
+		httputil.NewJSONResponse().Response(w, r)
 		return
 	}
 
-	cart, err := c.CartRepository.CartById(cartId)
+	cart, err := c.CartRepository.CartByID(cartID)
 
 	if err != nil && err == repository.ErrCartNotFound {
 		w.WriteHeader(http.StatusNotFound)
-		httputil.NewJsonResponse().Response(w, r)
+		httputil.NewJSONResponse().Response(w, r)
 		return
 	}
 
 	if err != nil {
-		httputil.NewJsonResponse(httputil.WithStatusCode(http.StatusInternalServerError)).
+		httputil.NewJSONResponse(httputil.WithStatusCode(http.StatusInternalServerError)).
 			Response(w, r)
 		return
 	}
 
-	httputil.NewJsonResponse(httputil.WithBody(cart)).
+	httputil.NewJSONResponse(httputil.WithBody(cart)).
 		Response(w, r)
 }
 
@@ -55,7 +55,7 @@ func (c *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 
 	if err != nil {
-		httputil.NewJsonResponse(httputil.WithStatusCode(http.StatusBadRequest)).
+		httputil.NewJSONResponse(httputil.WithStatusCode(http.StatusBadRequest)).
 			Response(w, r)
 	}
 

@@ -31,7 +31,7 @@ func (h *HealthCheckHandler) Health(w http.ResponseWriter, r *http.Request) {
 		Status: Ok,
 	}
 
-	httputil.NewJsonResponse(
+	httputil.NewJSONResponse(
 		httputil.WithBody(hc),
 	).Response(w, r)
 }

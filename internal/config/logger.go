@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	TraceIdContextKey = "traceId"
+	TraceIDContextKey = "traceId"
 )
 
 type ContextHandler struct {
@@ -15,8 +15,8 @@ type ContextHandler struct {
 }
 
 func (h *ContextHandler) Handle(ctx context.Context, r slog.Record) error {
-	if requestID, ok := ctx.Value(TraceIdContextKey).(string); ok {
-		r.AddAttrs(slog.String(TraceIdContextKey, requestID))
+	if requestID, ok := ctx.Value(TraceIDContextKey).(string); ok {
+		r.AddAttrs(slog.String(TraceIDContextKey, requestID))
 	}
 
 	return h.Handler.Handle(ctx, r)

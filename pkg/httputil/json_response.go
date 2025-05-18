@@ -8,16 +8,16 @@ import (
 )
 
 type (
-	JsonResponse struct {
+	JSONResponse struct {
 		statusCode *int
 		body       *any
 	}
 
-	Option func(*JsonResponse)
+	Option func(*JSONResponse)
 )
 
-func NewJsonResponse(opts ...Option) *JsonResponse {
-	jr := &JsonResponse{}
+func NewJSONResponse(opts ...Option) *JSONResponse {
+	jr := &JSONResponse{}
 
 	for _, opt := range opts {
 		opt(jr)
@@ -26,7 +26,7 @@ func NewJsonResponse(opts ...Option) *JsonResponse {
 	return jr
 }
 
-func (jr *JsonResponse) Response(w http.ResponseWriter, r *http.Request) {
+func (jr *JSONResponse) Response(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if jr.statusCode != nil {
@@ -41,13 +41,13 @@ func (jr *JsonResponse) Response(w http.ResponseWriter, r *http.Request) {
 }
 
 func WithStatusCode(statusCode int) Option {
-	return func(jr *JsonResponse) {
+	return func(jr *JSONResponse) {
 		jr.statusCode = &statusCode
 	}
 }
 
 func WithBody(body any) Option {
-	return func(jr *JsonResponse) {
+	return func(jr *JSONResponse) {
 		jr.body = &body
 	}
 }
@@ -64,5 +64,8 @@ func writeBoby(body any, w http.ResponseWriter) {
 		return
 	}
 
-	w.Write(bytes)
+	_, err = w.Write(bytes)
+	if err != nil {
+		slog.Error("Error writing response body", slog.String("error", err.Error()))
+	}
 }
