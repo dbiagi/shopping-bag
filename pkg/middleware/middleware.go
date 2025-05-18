@@ -12,20 +12,20 @@ type (
 )
 
 const (
-	TraceIdHeader                = "X-TRACE-ID"
-	TraceIdContextKey ContextKey = "traceId"
+	TraceIDHeader                = "X-TRACE-ID"
+	TraceIDContextKey ContextKey = "traceId"
 )
 
-func TraceIdMiddleware(next http.Handler) http.Handler {
+func TraceIDMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		traceId := r.Header.Get(TraceIdHeader)
-		if traceId == "" {
-			traceId = uuid.New().String()
+		traceID := r.Header.Get(TraceIDHeader)
+		if traceID == "" {
+			traceID = uuid.New().String()
 		}
-		w.Header().Set(TraceIdHeader, traceId)
+		w.Header().Set(TraceIDHeader, traceID)
 
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, TraceIdContextKey, traceId)
+		ctx = context.WithValue(ctx, TraceIDContextKey, traceID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

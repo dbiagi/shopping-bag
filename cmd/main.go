@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
 
 	"github.com/dbiagi/shopping-bag/cmd/command"
@@ -13,5 +15,9 @@ func main() {
 	}
 
 	rootCmd.AddCommand(command.NewServeCommand())
-	rootCmd.Execute()
+	err := rootCmd.Execute()
+
+	if err != nil {
+		log.Fatal("Error executing a command")
+	}
 }

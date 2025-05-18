@@ -46,16 +46,22 @@ func NewServer(c config.Configuration) *Server {
 }
 
 func (s *Server) Start() {
-	server, router := createServer(s.Configuration.WebConfig)
+	server, router := createServer(s.WebConfig)
 
 	handlers := createHandlers(s.Configuration)
 
 	registerRoutesAndMiddlewares(router, handlers)
-	configureGracefullShutdown(server, s.Configuration.WebConfig)
+	configureGracefullShutdown(server, s.WebConfig)
 }
 
 func (s *Server) ForceShutdown() {
-	s.Server.Shutdown(context.Background())
+	err := s.Server.Shutdown(context.Background())
+	if err != nil {
+		slog.Error(
+			"Error shuting down server",
+			slog.String("error", err.Error()),
+		)
+	}
 }
 
 func createServer(webConfig config.WebConfig) (*http.Server, *mux.Router) {
@@ -79,7 +85,7 @@ func createServer(webConfig config.WebConfig) (*http.Server, *mux.Router) {
 }
 
 func registerRoutesAndMiddlewares(router *mux.Router, h appHandlers) {
-	router.Use(middleware.TraceIdMiddleware)
+	router.Use(middleware.TraceIDMiddleware)
 	router.Use(mux.CORSMethodMiddleware(router))
 	router.HandleFunc("/health", h.HealthCheckHandler.Health).Methods("GET")
 	router.HandleFunc("/carts", h.CartHandler.CreateCart).Methods("POST")
@@ -96,7 +102,6 @@ func configureGracefullShutdown(server *http.Server, webConfig config.WebConfig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), webConfig.ShutdownTimeout)
 	defer cancel()
-
 	server.Shutdown(ctx)
 	slog.Info("Shutting down server")
 	os.Exit(0)

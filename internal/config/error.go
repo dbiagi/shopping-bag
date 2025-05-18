@@ -3,5 +3,5 @@ package config
 import "errors"
 
 var (
-	ErrCreatingAWSSession = errors.New("Error creating AWS session.")
+	ErrCreatingAWSSession = errors.New("error creating AWS session")
 )
