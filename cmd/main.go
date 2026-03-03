@@ -1,23 +1,48 @@
 package main
 
 import (
-	"log"
+    "context"
+    "log"
 
-	"github.com/spf13/cobra"
+    "github.com/dbiagi/shopping-bag/internal/config"
+    "github.com/dbiagi/shopping-bag/pkg/contextutil"
+    "github.com/dbiagi/shopping-bag/pkg/logging"
+    "github.com/kelseyhightower/envconfig"
+    "github.com/spf13/cobra"
 
-	"github.com/dbiagi/shopping-bag/cmd/command"
+    "github.com/dbiagi/shopping-bag/cmd/command"
+)
+
+var (
+    buildVersion = "unknown"
+    goVersion    = "unknown"
+    buildTime    = "unknown"
 )
 
 func main() {
-	rootCmd := cobra.Command{
-		Use:   "shopping-bag",
-		Short: "Shopping bag app CLI.",
-	}
+    cfg := &config.Configuration{}
+    err := envconfig.Process("", cfg)
+    if err != nil {
+        log.Fatalf("error loading configuration, error: %+v", err)
+    }
 
-	rootCmd.AddCommand(command.NewServeCommand())
-	err := rootCmd.Execute()
+    ctx := contextutil.WithServiceConfig(context.Background(), cfg)
+    logLevel := logging.LogLevelFromString(cfg.LogLevel)
+    logging.NewLogger(logLevel, map[string]string{
+        "service":   "shopping-bag",
+        "version":   buildVersion,
+        "goVersion": goVersion,
+        "buildTime": buildTime,
+    })
 
-	if err != nil {
-		log.Fatal("Error executing a command")
-	}
+    rootCmd := cobra.Command{
+        Use:   cfg.AppConfig.Name,
+        Short: cfg.AppConfig.Description,
+    }
+    rootCmd.AddCommand(command.NewServeCommand())
+    rootCmd.SetContext(ctx)
+
+    if cmdErr := rootCmd.Execute(); cmdErr != nil {
+        log.Fatalf("error executing a command, error: %+v", cmdErr)
+    }
 }
