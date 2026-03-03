@@ -13,6 +13,8 @@ import (
 	cartrepository "github.com/dbiagi/shopping-bag/internal/cart/repository"
 	"github.com/dbiagi/shopping-bag/internal/config"
 	healthhandler "github.com/dbiagi/shopping-bag/internal/health/handler"
+	"github.com/dbiagi/shopping-bag/pkg/contextutil"
+	"github.com/dbiagi/shopping-bag/pkg/logging"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -28,7 +30,8 @@ var (
 
 type (
 	Server struct {
-		config.Configuration
+		config config.Configuration
+		logger logging.Logger
 		*http.Server
 		*mux.Router
 	}
@@ -39,28 +42,30 @@ type (
 	}
 )
 
-func NewServer(c config.Configuration) *Server {
+func NewServer() *Server {
+	cfg := contextutil.GetServiceConfig[config.Configuration](context.Background())
+
 	return &Server{
-		Configuration: c,
+		config: cfg,
+		logger: logging.GetDefaultLogger(),
 	}
 }
 
 func (s *Server) Start() {
-	server, router := createServer(s.WebConfig)
+	server, router := createServer(s.config.WebConfig)
 
-	handlers := createHandlers(s.Configuration)
+	logger := logging.GetDefaultLogger()
+	logger.InfoContext(context.Background(), "starting server")
+	h := createHandlers(s.config)
 
-	registerRoutesAndMiddlewares(router, handlers)
-	configureGracefullShutdown(server, s.WebConfig)
+	registerRoutesAndMiddlewares(router, h)
+	configureGracefullShutdown(server, s.config.WebConfig)
 }
 
 func (s *Server) ForceShutdown() {
 	err := s.Server.Shutdown(context.Background())
 	if err != nil {
-		slog.Error(
-			"Error shuting down server",
-			slog.String("error", err.Error()),
-		)
+		s.logger.ErrorContext(context.Background(), "error shutting down server", slog.String("error", err.Error()))
 	}
 }
 
@@ -102,7 +107,10 @@ func configureGracefullShutdown(server *http.Server, webConfig config.WebConfig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), webConfig.ShutdownTimeout)
 	defer cancel()
-	server.Shutdown(ctx)
+	err := server.Shutdown(ctx)
+	if err != nil {
+		os.Exit(1)
+	}
 	slog.Info("Shutting down server")
 	os.Exit(0)
 }

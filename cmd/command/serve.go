@@ -1,10 +1,9 @@
 package command
 
 import (
-	"github.com/dbiagi/shopping-bag/internal/config"
-	internalhttp "github.com/dbiagi/shopping-bag/internal/http"
-
 	"github.com/spf13/cobra"
+
+	internalhttp "github.com/dbiagi/shopping-bag/internal/http"
 )
 
 func NewServeCommand() *cobra.Command {
@@ -15,11 +14,6 @@ func NewServeCommand() *cobra.Command {
 }
 
 func runServe(cmd *cobra.Command, args []string) {
-	env, _ := cmd.Flags().GetString("env")
-	if env == "" {
-		env = config.DevelopmentEnv
-	}
-	c := config.LoadConfig(env)
-	server := internalhttp.NewServer(c)
+	server := internalhttp.NewServer()
 	server.Start()
 }
